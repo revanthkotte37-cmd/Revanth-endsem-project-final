@@ -2,6 +2,7 @@
   "name": "sample-project",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://revanthkotte37-cmd.github.io/Revanth-endsem-project-final",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
