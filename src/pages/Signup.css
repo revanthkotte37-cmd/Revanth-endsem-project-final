@@ -1,0 +1,11 @@
+.signup-page{ display:flex; align-items:center; justify-content:center; padding:40px 16px; }
+.signup-card{ width:100%; max-width:520px; background:var(--card-bg,#fff); border-radius:10px; box-shadow:0 6px 24px rgba(16,24,40,0.06); padding:24px; }
+.muted{ color:#6b7280; }
+.label{ display:block; margin-top:12px; font-weight:600; }
+.input{ width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); margin-top:6px; }
+.risk-row{ display:flex; gap:16px; margin-top:8px; }
+.actions{ display:flex; gap:8px; margin-top:16px; justify-content:flex-end; }
+.btn{ padding:8px 12px; border-radius:8px; cursor:pointer; }
+.btn--primary{ background:#2563eb; color:#fff; border:none; }
+.btn--ghost{ background:transparent; border:1px solid rgba(0,0,0,0.08); }
+.error{ color:#dc2626; margin-top:8px; }

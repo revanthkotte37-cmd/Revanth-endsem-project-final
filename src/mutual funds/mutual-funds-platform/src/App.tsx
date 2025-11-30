@@ -1,0 +1,90 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import { Provider } from 'react-redux';
+import { store } from './store';
+import theme from './utils/theme';
+import Layout from './components/common/Layout';
+import Login from './components/auth/Login';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import FundsList from './pages/FundsList';
+import FundDetails from './pages/FundDetails';
+import InvestorDashboard from './pages/InvestorDashboard';
+import FinancialAdvisorDashboard from './pages/FinancialAdvisorDashboard';
+import AdminDashboard from './pages/AdminDashboard';
+
+function App() {
+  return (
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute allowedRoles={['investor', 'advisor', 'admin', 'analyst']}>
+                  <Layout>
+                    <FundsList />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['investor']}>
+                  <Layout>
+                    <InvestorDashboard />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/advisor-dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['advisor']}>
+                  <Layout>
+                    <FinancialAdvisorDashboard />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/fund/:id"
+              element={
+                <ProtectedRoute allowedRoles={['investor', 'advisor', 'admin', 'analyst']}>
+                  <Layout>
+                    <FundDetails />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <Layout>
+                    <AdminDashboard />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/analytics"
+              element={
+                <ProtectedRoute allowedRoles={['advisor', 'admin', 'analyst']}>
+                  <Layout>
+                    <div>Analytics Dashboard</div>
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </ThemeProvider>
+    </Provider>
+  );
+}
+
+export default App;
