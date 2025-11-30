@@ -2,7 +2,7 @@ import React from 'react';
 
 const format = (v) => `₹${v.toLocaleString()}`;
 
-const PortfolioSummary = ({ totalValue = 0, dayChange = 0, dayChangePct = 0, onAdd = ()=>{} }) => {
+const PortfolioSummary = ({ totalValue = 0, dayChange = 0, dayChangePct = 0, onAdd = ()=>{}, onRebalance = () => {} }) => {
   return (
     <div style={{ display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'space-between', padding: 12, borderRadius: 8, background: '#fff', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
       <div>
@@ -13,7 +13,7 @@ const PortfolioSummary = ({ totalValue = 0, dayChange = 0, dayChangePct = 0, onA
       <div style={{ display: 'flex', gap: 8 }}>
         <button onClick={onAdd} style={{ padding: '8px 12px' }}>Add money</button>
         <button style={{ padding: '8px 12px' }}>Withdraw</button>
-        <button onClick={() => onRebalance && onRebalance()} style={{ padding: '8px 12px' }}>Rebalance</button>
+  <button onClick={() => onRebalance && onRebalance()} style={{ padding: '8px 12px' }}>Rebalance</button>
       </div>
     </div>
   );

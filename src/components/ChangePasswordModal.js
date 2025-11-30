@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
+import { hashPassword } from '../utils/hash';
 
 const overlay = { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 };
 const box = { background: '#fff', padding: 20, width: 420, borderRadius: 8 };
-
-import { hashPassword } from '../utils/hash';
 
 export default function ChangePasswordModal({ open, onClose, user, onSave }) {
   const [current, setCurrent] = useState('');

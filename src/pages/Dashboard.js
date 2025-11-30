@@ -10,7 +10,8 @@ import RebalanceModal from '../components/RebalanceModal';
 import { getPortfolio, addTransaction, applyRebalance } from '../services/portfolioService';
 
 const Dashboard = () => {
-  const { theme } = useContext(UserContext);
+  // theme was unused; remove to avoid ESLint unused-var warning
+  useContext(UserContext);
   const navigate = useNavigate();
   const [portfolio, setPortfolio] = useState(null);
   const [user, setUser] = useState(null);
@@ -57,7 +58,13 @@ const Dashboard = () => {
       </div>
 
       <div style={{ marginTop: 12 }}>
-        <PortfolioSummary totalValue={portfolio.totalValue} dayChange={+(portfolio.totalValue - (portfolio.history && portfolio.history[portfolio.history.length-2]?.value || 0)).toFixed(2)} dayChangePct={0} onAdd={() => setShowAdd(true)} onRebalance={() => setShowRebalance(true)} />
+        {(() => {
+          const prev = (portfolio.history && portfolio.history[portfolio.history.length - 2]?.value) || 0;
+          const dayChange = +(portfolio.totalValue - prev).toFixed(2);
+          return (
+            <PortfolioSummary totalValue={portfolio.totalValue} dayChange={dayChange} dayChangePct={0} onAdd={() => setShowAdd(true)} onRebalance={() => setShowRebalance(true)} />
+          );
+        })()}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12, marginTop: 12 }}>

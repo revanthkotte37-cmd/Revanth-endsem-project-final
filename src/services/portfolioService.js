@@ -190,4 +190,5 @@ export const applyRebalance = (portfolio, options = { method: 'equal' }) => {
   return { portfolio: p, trades: sim.trades };
 };
 
-export default { getPortfolio, savePortfolio, addTransaction, simulateRebalance, applyRebalance };
+const portfolioService = { getPortfolio, savePortfolio, addTransaction, simulateRebalance, applyRebalance };
+export default portfolioService;

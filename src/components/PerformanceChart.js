@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ResponsiveContainer, LineChart, Line, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { ResponsiveContainer, LineChart, Line, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Brush } from 'recharts';
 
 // normalize series to 100 at first point
 const normalized = (history) => {
@@ -25,7 +25,8 @@ const PerformanceChart = ({ funds = [], normalize = true }) => {
 
   const handleLegendClick = (obj) => {
     // obj.payload or obj has 'value' or 'dataKey' depending on Legend payload
-    const name = obj && (obj.value || obj.payload && obj.payload.value || obj.dataKey || obj.name);
+    // clarify operator precedence to satisfy ESLint no-mixed-operators
+    const name = obj && (obj.value || (obj.payload && obj.payload.value) || obj.dataKey || obj.name);
     if (!name) return;
     setVisible(prev => ({ ...prev, [name]: !prev[name] }));
   };
