@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { ResponsiveContainer, LineChart, Line, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Brush } from 'recharts';
 
 // normalize series to 100 at first point
@@ -22,6 +22,37 @@ const PerformanceChart = ({ funds = [], normalize = true }) => {
   }, [funds]);
 
   const [visible, setVisible] = useState(initialVisible);
+  // seriesData holds a rolling time-series for each fund so we can simulate realtime updates
+  const buildInitialSeries = () => funds.map((f) => {
+    const data = (normalize ? normalized(f.history) : (f.history || [])).map(d => ({ date: d.date || new Date().toLocaleTimeString(), value: d.value }));
+    return { id: f.id, name: f.name, data: data.length ? data : [{ date: new Date().toLocaleTimeString(), value: f.nav || 100 }] };
+  });
+
+  const [seriesData, setSeriesData] = useState(buildInitialSeries);
+  const intervalRef = useRef(null);
+
+  // reinitialize when funds or normalize prop changes
+  useEffect(() => {
+    setSeriesData(buildInitialSeries());
+  }, [funds, normalize]);
+
+  // simulate realtime updates by appending a new point every 2s
+  useEffect(() => {
+    // clear existing
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      setSeriesData(prev => prev.map(s => {
+        const last = s.data[s.data.length - 1] || { value: 100 };
+        // small random walk +/-0.5%
+        const factor = 1 + ((Math.random() - 0.5) * 0.01);
+        const nextValue = Math.max(0, +(last.value * factor).toFixed(2));
+        const nextDate = new Date().toLocaleTimeString();
+        const nextData = [...s.data.slice(-120), { date: nextDate, value: nextValue }];
+        return { ...s, data: nextData };
+      }));
+    }, 2000);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [funds, normalize]);
 
   const handleLegendClick = (obj) => {
     // obj.payload or obj has 'value' or 'dataKey' depending on Legend payload
@@ -54,28 +85,28 @@ const PerformanceChart = ({ funds = [], normalize = true }) => {
             <Tooltip contentStyle={{ fontSize: 13 }} cursor={{ stroke: '#8884d8', strokeWidth: 1 }} />
             <Legend wrapperStyle={{ paddingTop: 8 }} onClick={handleLegendClick} />
 
-            {funds.map((f, idx) => (
-              <React.Fragment key={f.id}>
+            {seriesData.map((s, idx) => (
+              <React.Fragment key={s.id}>
                 <Area
-                  data={normalize ? normalized(f.history) : f.history}
+                  data={s.data}
                   type="monotone"
                   dataKey="value"
-                  name={f.name}
+                  name={s.name}
                   stroke={palette[idx % palette.length]}
                   fillOpacity={1}
                   fill={`url(#grad-${idx})`}
                   activeDot={false}
                   isAnimationActive={false}
-                  hide={!visible[f.name]}
+                  hide={!visible[s.name]}
                 />
                 <Line
-                  data={normalize ? normalized(f.history) : f.history}
+                  data={s.data}
                   dataKey="value"
                   stroke={palette[idx % palette.length]}
                   strokeWidth={2.25}
                   dot={false}
                   type="monotone"
-                  hide={!visible[f.name]}
+                  hide={!visible[s.name]}
                 />
               </React.Fragment>
             ))}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import sampleFunds from '../data/funds';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
@@ -15,11 +15,30 @@ const FundDetails = () => {
   );
 
   // prepare history for chart; fallback to last NAV-like values if history missing
-  const history = fund.history && fund.history.length ? fund.history : [
-    { date: '2025-01', value: fund.nav * 0.85 },
-    { date: '2025-06', value: fund.nav * 0.92 },
-    { date: '2025-11', value: fund.nav }
+  const initialHistory = fund.history && fund.history.length ? fund.history.map(h => ({ date: h.date || new Date().toLocaleTimeString(), value: h.value })) : [
+    { date: new Date().toLocaleTimeString(), value: +(fund.nav * 0.85).toFixed(2) },
+    { date: new Date().toLocaleTimeString(), value: +(fund.nav * 0.92).toFixed(2) },
+    { date: new Date().toLocaleTimeString(), value: +(fund.nav).toFixed(2) }
   ];
+
+  const [liveHistory, setLiveHistory] = useState(initialHistory);
+  const intRef = useRef(null);
+
+  useEffect(() => {
+    // initialize
+    setLiveHistory(initialHistory);
+    if (intRef.current) clearInterval(intRef.current);
+    intRef.current = setInterval(() => {
+      setLiveHistory(prev => {
+        const last = prev[prev.length - 1] || { value: fund.nav };
+        const factor = 1 + ((Math.random() - 0.5) * 0.01);
+        const next = Math.max(0, +(last.value * factor).toFixed(2));
+        const nextDate = new Date().toLocaleTimeString();
+        return [...prev.slice(-200), { date: nextDate, value: next }];
+      });
+    }, 2000);
+    return () => { if (intRef.current) clearInterval(intRef.current); };
+  }, [fund.id]);
 
   return (
     <div style={{ padding: 20, maxWidth: 980 }}>
@@ -37,7 +56,7 @@ const FundDetails = () => {
                 <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                 <YAxis tickFormatter={(v) => `${v}`} />
                 <Tooltip formatter={(value) => [`₹${value}`, 'Value']} />
-                <Line type="monotone" dataKey="value" stroke="#2563eb" strokeWidth={2} dot={{ r: 2 }} />
+                <Line type="monotone" dataKey="value" stroke="#2563eb" strokeWidth={2} dot={{ r: 2 }} data={liveHistory} />
               </LineChart>
             </ResponsiveContainer>
           </div>
